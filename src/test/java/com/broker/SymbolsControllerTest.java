@@ -45,8 +45,8 @@ class SymbolsControllerTest {
         var response = httpClient.toBlocking().exchange("/" + testSymbol.value(), JsonNode.class);
         //Assert
         assertEquals(HttpStatus.OK, response.getStatus());
-        final var stringBuilder = new StringBuilder("\"");
-        stringBuilder.append(testSymbol.value()).append("\"");
-        assertEquals(stringBuilder.toString(), response.getBody().get().get("value").toString());
+        final var strBuilder = new StringBuilder("\"");
+        strBuilder.append(testSymbol.value()).append("\"");
+        assertEquals(strBuilder.toString(), response.getBody().get().get("value").toString());
     }
 }
