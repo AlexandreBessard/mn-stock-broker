@@ -10,11 +10,15 @@ import io.micronaut.test.extensions.junit5.annotation.MicronautTest;
 import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @MicronautTest
 class SymbolsControllerTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SymbolsControllerTest.class);
 
     @Inject
     @Client("/symbols")
@@ -48,5 +52,26 @@ class SymbolsControllerTest {
         final var strBuilder = new StringBuilder("\"");
         strBuilder.append(testSymbol.value()).append("\"");
         assertEquals(strBuilder.toString(), response.getBody().get().get("value").toString());
+    }
+
+    @Test
+    void symbolsEndpointQueryParameters() {
+        var response = httpClient.toBlocking().exchange("/filter?max=10", JsonNode.class);
+        //Assert
+        assertEquals(HttpStatus.OK, response.getStatus());
+        LOG.debug("Max: 10: {}", response.getBody().get().toPrettyString());
+        assertEquals(10, response.getBody().get().size());
+
+        response = httpClient.toBlocking().exchange("/filter?offset=7", JsonNode.class);
+        //Assert
+        assertEquals(HttpStatus.OK, response.getStatus());
+        LOG.debug("Offset: 7 {}", response.getBody().get().toPrettyString());
+        assertEquals(3, response.getBody().get().size());
+
+        response = httpClient.toBlocking().exchange("/filter?max=2&offset=7", JsonNode.class);
+        //Assert
+        assertEquals(HttpStatus.OK, response.getStatus());
+        LOG.debug("Max 2, Offset: 7 {}", response.getBody().get().toPrettyString());
+        assertEquals(2, response.getBody().get().size());
     }
 }
